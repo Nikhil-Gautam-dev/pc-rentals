@@ -1,0 +1,77 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const pageTitle = "About Us";
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <section class="about-section">
+    <div class="about-content">
+      <h1>About PC Rentals</h1>
+      <p>
+        Welcome to PC Rentals – your one-stop solution for renting
+        high-performance PCs tailored for gamers, professionals, and businesses.
+        Our mission is to empower you with the latest technology without the
+        burden of ownership.
+      </p>
+      <p>
+        We carefully maintain our collection of PCs ensuring maximum
+        performance, reliability, and customer satisfaction. Explore our
+        services and find the perfect PC that meets your needs.
+      </p>
+    </div>
+    <div class="about-image">
+      <img src="/pcs/6.jpg" alt="PC Rentals" loading="lazy" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 10rem 4rem;
+    margin-bottom: 2rem;
+    /* background-color: #161026; */
+  }
+  .about-content {
+    flex: 1;
+    color: #bdbdbd;
+    font-family: "Oxanium", sans-serif;
+  }
+  .about-content h1 {
+    font-size: 2.5rem;
+    color: #f7f7f7;
+    margin-bottom: 1rem;
+  }
+  .about-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .about-image {
+    flex: 1;
+    text-align: center;
+  }
+  .about-image img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  @media (max-width: 768px) {
+    .about-section {
+      flex-direction: column-reverse;
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    .about-content h1 {
+      font-size: 2rem;
+    }
+    .about-content p {
+      font-size: 1rem;
+    }
+  }
+</style>

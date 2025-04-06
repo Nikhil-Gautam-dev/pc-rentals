@@ -1,0 +1,182 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+export const prerender = false;
+import axios from "axios";
+
+const id = Astro.url.searchParams.get("id");
+
+
+let selectedPC: any;
+
+try {
+  console.log(id);
+  const response = await axios.get(`http://localhost:8000/api/pc/getPCById?id=${id}`);
+  if (response.status == 200) {
+    selectedPC = response.data.data;
+  }
+} catch (error) {
+  console.log("error in fetching ", error);
+}
+selectedPC = selectedPC || {
+  name: "Gaming PC",
+  description: "High-performance gaming computer with the latest components.",
+  cpu: "Intel i9",
+  gpu: "RTX 4080",
+  ram: "32GB DDR5",
+  storage: "2TB NVMe SSD",
+  price: 899,
+  image: "/placeholder-pc.jpg",
+  specs: ["abv"],
+};
+
+console.log(selectedPC);
+
+const totalPrice = Astro.props.totalPrice || 1051;
+
+const pc : any = selectedPC;
+---
+
+<BaseLayout pageTitle={pc.name.split(" ").join("-")}>
+  <div class="pc">
+    <div class="pc-hero">
+      <img src={pc.image} alt={pc.name} class="pc-image" />
+    </div>
+    <div class="pc-specs">
+      <h1 class="pc-name">{pc.name}</h1>
+      <div class="specs">
+        <h2>Specifications</h2>
+        <ul>
+          {pc.specs.map((spec) => <li>{spec}</li>)}
+        </ul>
+      </div>
+      <div class="price">
+        <h2>Price</h2>
+        <p>{`Rs ${pc.rentPerDay}/day`}</p>
+      </div>
+      <button>
+        <a href=`/checkout?id=${pc._id}`>Rent Now</a>
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .pc {
+    padding: 5rem 7.5rem;
+    display: flex;
+    gap: 2rem;
+    .pc-hero {
+      width: 50%;
+      .pc-image {
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .pc-specs {
+      width: 50%;
+      background-color: #161026;
+      border-radius: 15px;
+      border: 1px solid #2a2241;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      h1 {
+        width: 100%;
+        font-size: 2.25rem;
+        font-family: "Oxanium";
+        font-weight: 600;
+        color: #bdf9a1;
+      }
+      .specs {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        h2 {
+          font-size: 1.5rem;
+          font-family: "Oxanium";
+          font-weight: 600;
+          color: #f7f7f7;
+        }
+        ul {
+          list-style-type: none;
+          padding: 0;
+          margin-left: 1rem;
+          li {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #bdbdbd;
+            &:before {
+              content: "•";
+              color: #bdf9a1;
+              display: inline-block;
+              width: 1em;
+              margin-left: -1em;
+            }
+          }
+        }
+      }
+      .price {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        h2 {
+          font-size: 1.5rem;
+          font-family: "Oxanium";
+          font-weight: 600;
+          color: #f7f7f7;
+        }
+        p {
+          font-size: 2rem;
+          font-weight: 400;
+          color: #bdbdbd;
+        }
+      }
+    }
+
+    a{
+        list-style: none;
+        color: white;
+        text-decoration: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .pc {
+      padding: 4rem 1rem;
+      flex-direction: column;
+      .pc-hero {
+        width: 100%;
+        .pc-image {
+          height: 100%;
+          width: 100%;
+        }
+      }
+      .pc-specs {
+        width: 100%;
+        padding: 1rem;
+        h1 {
+          font-size: 1.75rem;
+        }
+        .specs {
+          h2 {
+            font-size: 1.25rem;
+          }
+          ul {
+            margin-left: 0.5rem;
+            li {
+              font-size: 1rem;
+            }
+          }
+        }
+        .price {
+          h2 {
+            font-size: 1.25rem;
+          }
+          p {
+            font-size: 1.5rem;
+          }
+        }
+    }
+  }
+</style>

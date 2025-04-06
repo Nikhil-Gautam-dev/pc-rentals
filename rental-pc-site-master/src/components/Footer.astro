@@ -1,0 +1,153 @@
+<footer>
+  <div class="footer-links">
+    <div class="quick-links footer-column">
+      <h1 class="footer-heading">Quick Links</h1>
+      <div class="footer-quick-links">
+        <a href="/" class="header_link">Home</a>
+        <a href="/about" class="header_link">About Us</a>
+        <a href="/services" class="header_link">Services</a>
+        <a href="/gallery" class="header_link">Gallery</a>
+        <a href="/contact" class="header_link">Contact</a>
+        <a href="" class="header_link" id="logout">Logout</a>
+      </div>
+    </div>
+    <div class="footer-contact footer-column">
+      <h1 class="footer-heading">Contact</h1>
+      <div class="contact-info">
+        <p>+91 123-456-7890</p>
+        <p>johndoe@gmail.com</p>
+      </div>
+    </div>
+    <div class="footer-address footer-column">
+      <h1 class="footer-heading">Address</h1>
+      <div class="f-address">
+        <p>123, <br /> XYZ Street, ABC City</p>
+        <p>India</p>
+      </div>
+    </div>
+    <div class="footer-socials footer-column">
+      <h1 class="footer-heading">Follow Us</h1>
+      <div class="social-links">
+        <a href="https://www.facebook.com" class="social-link">Facebook</a>
+        <a href="https://www.twitter.com" class="social-link">Twitter</a>
+        <a href="https://www.instagram.com" class="social-link">Instagram</a>
+      </div>
+    </div>
+  </div>
+  <div class="bar">
+    <p>© 2024 PC RENTALS. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  import { clearAllCookies } from "../utils/cookiesHandler";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document
+      .getElementById("logout")
+      .addEventListener("click", () => clearAllCookies());
+  });
+</script>
+
+<style>
+  footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-family: "Oxanium";
+    font-weight: 400;
+    color: #b7b7b7;
+    background: linear-gradient(
+      210deg,
+      rgba(47, 43, 106, 0.2) 0%,
+      rgba(38, 34, 85, 0.31) 40%,
+      rgba(36, 33, 81, 0.3) 100%
+    );
+    backdrop-filter: blur(1.25rem);
+    border: 1px solid #2a2241;
+    padding: 2rem 7.5rem;
+    padding-bottom: 0;
+  }
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center !important;
+  }
+  .footer-heading {
+    font-size: 1.3rem;
+    font-weight: 600;
+    font-family: "Cyber";
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+  .footer-quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    a {
+      color: b7b7b7;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #b7b7b7;
+      &:hover {
+        color: #bdf9a1;
+      }
+    }
+  }
+  .contact-info {
+    p {
+      font-size: 1rem;
+      font-weight: 400;
+      margin: 0.5rem 0;
+    }
+  }
+  .footer-socials {
+    .social-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      a {
+        color: b7b7b7;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #b7b7b7;
+        &:hover {
+          color: #bdf9a1;
+        }
+      }
+    }
+  }
+  .bar {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    margin-top: 2rem;
+    border-top: 1px solid #2a2241;
+    p {
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+  }
+  @media screen and (max-width: 768px) {
+    footer {
+      padding: 2rem 2rem 0;
+      .footer-links {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .bar {
+        p {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+</style>

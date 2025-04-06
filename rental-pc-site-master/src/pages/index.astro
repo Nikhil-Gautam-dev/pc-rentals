@@ -1,0 +1,454 @@
+---
+import Image from "astro/components/Image.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+export const prerender = false;
+import Card from "../components/Card.astro";
+import axios from "axios";
+
+let selectedPC: any = [];
+
+await (async () => {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/pc/`);
+    if (response.status === 200) {
+      selectedPC = response.data.data;
+    }
+  } catch (error) {
+    console.log("error in fetching ", error);
+  }
+})();
+
+const filteredPC = selectedPC.filter((pc: any) => {
+  if (!pc.rented) {
+    return pc;
+  }
+});
+
+const pcs = filteredPC || [];
+
+console.log(pcs);
+
+const pageTitle = "Home";
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <div class="hero">
+    <div class="hero-info">
+      <h1 class="hero-text">
+        The <span>Best PC Rental</span>
+        <br /> Services in India
+      </h1>
+      <p class="hero-description">
+        Rent the perfect PC for any occasion. <br /> India's premier PC rental service.
+      </p>
+      <button class="apply-btn"> Rent Now </button>
+    </div>
+    <div class="fade-l"></div>
+    <div class="fade-b"></div>
+  </div>
+  <div class="m-hero-info">
+    <h1 class="hero-text">
+      The <span>Best PC Rental</span>
+      <br /> Services in India
+    </h1>
+    <p class="hero-description">
+      Rent the perfect PC for any occasion. <br /> India's premier PC rental service.
+    </p>
+    <button class="apply-btn"> Rent Now </button>
+  </div>
+  <div class="about-section">
+    <div class="about-img">
+      <Image
+        src="https://nzxt.com/assets/cms/34299/1659594250-boost-performance-primary.png?auto=format&fit=fillmax&h=1344&w=1344"
+        width={1152}
+        height={860}
+        alt="About Us"
+        loading="lazy"
+      />
+    </div>
+    <div class="about-content">
+      <h1>PC rentals in India</h1>
+      <p>
+        Experience the convenience of renting a PC in India with our flexible
+        and cost-effective solutions. Whether you're an individual or a
+        business, our rental services provide you with the latest technology
+        without the burden of ownership.
+      </p>
+      <button>Know More</button>
+    </div>
+  </div>
+  <div class="collection">
+    <div class="collection-headings">
+      <h2>Performance for every budget</h2>
+      <h1>PC Collections</h1>
+    </div>
+    <div class="collection-container">
+      {
+        pcs && Array.isArray(pcs) && pcs.length > 0 ? (
+          pcs.map((pc: any) => (
+            <Card
+              image={pc.image}
+              name={pc.name}
+              specs={pc.specs}
+              slug={pc.name.split(" ").join("-").toLowerCase()}
+              id={pc._id}
+              loading="lazy"
+            />
+          ))
+        ) : (
+          <div class="no-pcs">
+            <p>
+              Currently loading our PC collection. Please check back shortly.
+            </p>
+          </div>
+        )
+      }
+    </div>
+    <div class="collection-btn">
+      <button><a href="/gallery" class="view-more-btn">View More</a></button>
+    </div>
+  </div>
+  <div class="contact-section">
+    <div class="contact-desc">
+      <h1>Booking Open For Gaming Pc's</h1>
+      <p>
+        To maintain High Quality, Client Satisfaction and Maximum Accuracy, we
+        accept very limited bookings depending upon our back-end team size. So,
+        we may increase our service charge dynamically as per demand. you can
+        book.
+      </p>
+      <ul>
+        <li>Quality Products</li>
+        <li>Best Performanence</li>
+        <li>Easy to use</li>
+        <li>Affordable Price</li>
+      </ul>
+    </div>
+    <div class="contact-form">
+      <form>
+        <input type="text" placeholder="Name" />
+        <input type="email" placeholder="Email" />
+        <input type="text" placeholder="Phone" />
+        <textarea placeholder="Message"></textarea>
+        <div class="contact-button">
+          <button>Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    background-image: url("https://i.postimg.cc/T30MQNyR/hero.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    position: relative;
+    padding: 20rem 10rem;
+    .hero-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: relative;
+      z-index: 10;
+      .hero-text {
+        font-size: 3rem;
+        font-weight: 400;
+        span {
+          color: #bdf9a1;
+          font-weight: 600;
+        }
+      }
+      .hero-description {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #f7f7f7;
+        z-index: 10;
+        position: relative;
+      }
+    }
+    .fade-l {
+      position: absolute;
+      left: 0;
+      top: 0;
+      min-width: 120px;
+      width: 50%;
+      height: 100%;
+      z-index: 0;
+      background-image: linear-gradient(90deg, #0f0914, transparent);
+    }
+    .fade-b {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 8rem;
+      z-index: 0;
+      background-image: linear-gradient(transparent, #0f0914);
+    }
+  }
+  .m-hero-info {
+    display: none;
+  }
+  .about-section {
+    height: calc(100vh - 4rem);
+    padding: 0 7.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    .about-img {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: drop-shadow(0 0 2rem rgba(143, 104, 255, 0.4));
+        transition: filter 0.6s;
+        &:hover {
+          filter: drop-shadow(0 0 2rem rgba(143, 104, 255, 0.8));
+          transition: filter 0.6s;
+        }
+      }
+    }
+    .about-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #161026;
+      border-radius: 15px;
+      gap: 2rem;
+      border: 1px solid #2a2241;
+      padding-top: 3rem;
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        line-height: 1;
+      }
+      p {
+        padding: 0 5rem;
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #bdbdbd;
+      }
+      button {
+        width: 100%;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid #2a2241;
+        height: 4rem;
+        font-family: "Oxanium";
+        font-weight: 300;
+      }
+
+      button > a {
+        text-decoration: none;
+      }
+    }
+  }
+  .collection {
+    padding: 0 7.5rem;
+    .collection-headings {
+      font-family: "Oxanium";
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      h2 {
+        font-size: 1rem;
+        font-weight: 400;
+        color: #bdbdbd;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #f7f7f7;
+      }
+    }
+    .collection-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .no-pcs {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      background-color: #161026;
+      border-radius: 8px;
+      border: 1px solid #2a2241;
+    }
+    .collection-btn {
+      display: flex;
+      justify-content: center;
+      button {
+        margin-top: 2rem;
+      }
+    }
+  }
+  .contact-section {
+    height: 80vh;
+    padding: 0 7.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    .contact-desc {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      h1 {
+        font-size: 2.5rem;
+        font-family: "Oxanium";
+        font-weight: 600;
+        color: #f7f7f7;
+      }
+      p {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: #bdbdbd;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin-left: 2rem;
+        li {
+          font-size: 1.2rem;
+          font-weight: 400;
+          color: #bdbdbd;
+          &:before {
+            content: "•";
+            color: #bdf9a1;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+          }
+        }
+      }
+    }
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        input,
+        textarea {
+          padding: 1rem;
+          border: 1px solid #2a2241;
+          border-radius: 8px;
+          background-color: #161026;
+          color: #bdbdbd;
+        }
+        .contact-button {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          button {
+            box-shadow: none;
+            background-color: #bdf9a1;
+            color: #0f0914;
+            margin-top: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .view-more-btn {
+    text-decoration: none;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      height: 360px;
+      width: 100%;
+      padding: 0;
+      background-size: cover;
+      background-repeat: no-repeat;
+      .hero-info {
+        display: none;
+      }
+      .fade-l {
+        display: none;
+      }
+    }
+    .m-hero-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+      text-align: center;
+      .hero-text {
+        font-size: 2rem;
+        span {
+          color: #bdf9a1;
+          font-weight: 600;
+        }
+      }
+      .hero-description {
+        font-size: 1rem;
+        color: #f7f7f7;
+      }
+    }
+    .about-section {
+      padding: 5rem 2rem 5rem;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5rem;
+      .about-img {
+        img {
+          height: 100%;
+        }
+      }
+      .about-content {
+        padding: 0 2rem;
+        padding-top: 2rem;
+        h1 {
+          font-size: 2rem;
+        }
+        p {
+          padding: 0;
+        }
+      }
+    }
+    .collection {
+      padding: 0 2rem 5rem;
+      .collection-headings {
+        h1 {
+          font-size: 1.5rem;
+        }
+      }
+      .collection-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .collection-btn {
+        margin-top: 0.5rem;
+      }
+    }
+    .contact-section {
+      height: auto;
+      padding: 0 2rem 5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      .contact-desc {
+        h1 {
+          font-size: 2rem;
+        }
+        p {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+</style>

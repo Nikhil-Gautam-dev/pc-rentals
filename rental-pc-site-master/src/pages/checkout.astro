@@ -1,0 +1,1093 @@
+---
+// Removed incorrect import of undefined
+import BaseLayout from "../layouts/BaseLayout.astro";
+export const prerender = false;
+import axios from "axios";
+
+const id = Astro.url.searchParams.get("id");
+const orderId = Astro.url.searchParams.get("orderId");
+
+Astro.cookies.get("");
+
+console.log(id);
+console.log();
+
+const isItNewOrder = id != null && id.trim() != "";
+
+let selectedPC: any;
+
+let url = null;
+if (isItNewOrder) {
+  url = `http://localhost:8000/api/pc/getPCById?id=${id}`;
+} else {
+  url = `http://localhost:8000/api/rent/getOrderById?orderId=${orderId}`;
+}
+
+try {
+  console.log(id);
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: Astro.cookies.get("accessToken").value,
+    },
+  });
+  if (response.status == 200) {
+    selectedPC = response.data.data;
+  }
+} catch (error) {
+  console.log("error in fetching ", error);
+}
+
+selectedPC = selectedPC || {
+  name: "Gaming PC",
+  description: "High-performance gaming computer with the latest components.",
+  cpu: "Intel i9",
+  gpu: "RTX 4080",
+  ram: "32GB DDR5",
+  storage: "2TB NVMe SSD",
+  price: 899,
+  image: "/placeholder-pc.jpg",
+  specs: ["abv"],
+};
+
+const totalPrice = Astro.props.totalPrice || 1051;
+---
+
+<BaseLayout title="Checkout | PC Rentals">
+  <div class="checkout-wrapper">
+    <h1 class="checkout-title">Complete Your Order</h1>
+
+    <div class="checkout-container">
+      <!-- Left Column: PC Details -->
+      <div class="pc-card loading-container">
+        <div class="pc-card-header">
+          <h2>Your Selected PC</h2>
+        </div>
+        <div class="loading-overlay">
+          <div class="spinner"></div>
+          <p>Loading PC details...</p>
+        </div>
+        <div class="pc-content">
+          <div class="pc-image-container">
+            <img
+              src={selectedPC.image}
+              alt={selectedPC.name}
+              class="pc-image"
+              loading="lazy"
+            />
+          </div>
+          <div class="pc-details">
+            <h3 id="pcName">{selectedPC.name}</h3>
+            <p class="pc-description" id="pcDescription">
+              {selectedPC.description}
+            </p>
+
+            {
+              selectedPC.specs.length ? (
+                <ul class="pc-specs-list" id="pcSpecsList">
+                  {Array.from(selectedPC.specs).map((spec: any) => (
+                    <li class="spec-item">
+                      <span class="spec-value" id="pcCPU">
+                        specs -{spec}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <h1>hello</h1>
+              )
+            }
+
+            <p class="pc-price">
+              <span class="price-label">Price per day:</span>
+              <span class="price-value">${selectedPC.rentPerDay}</span>
+            </p>
+
+            <p class="pc-price">
+              <span class="price-label">Price per hour:</span>
+              <span class="price-value">${selectedPC.rentPerHour}</span>
+            </p>
+
+            <div class="rental-options">
+              <div class="rental-field">
+                <label for="rentalUnit">Rental Unit:</label>
+                <select id="rentalUnit" class="rental-select">
+                  <option value="day">Day</option>
+                  <option value="hour">Hour</option>
+                </select>
+              </div>
+              <div class="rental-field">
+                <label for="rentalDuration">Duration:</label>
+                <input
+                  type="number"
+                  id="rentalDuration"
+                  class="rental-input"
+                  min="1"
+                  value="1"
+                />
+              </div>
+            </div>
+
+            <div class="rental-actions">
+              <button class="order-button" id="orderButton"
+                >Confirm Order</button
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary -->
+      <div class="bill-details loading-container">
+        <div class="bill-header">
+          <h2>Order Summary</h2>
+        </div>
+        <div class="loading-overlay">
+          <div class="spinner"></div>
+          <p>Calculating total...</p>
+        </div>
+        <div class="bill-content">
+          <div class="bill-item">
+            <span>Base Rental Price</span>
+            <span id="basePrice">${selectedPC.rentPerDay}</span>
+          </div>
+          <div class="bill-item">
+            <span>Duration</span>
+            <span id="durationText">1 day</span>
+          </div>
+          <div class="bill-item">
+            <span>Insurance</span>
+            <span>$49</span>
+          </div>
+          <div class="bill-item">
+            <span>Delivery</span>
+            <span>$25</span>
+          </div>
+          <div class="bill-item">
+            <span>Tax</span>
+            <span>$78</span>
+          </div>
+          <div class="bill-divider"></div>
+          <div class="bill-total">
+            <span>Total</span>
+            <span id="totalPrice">${totalPrice}</span>
+          </div>
+
+          <button class="pay-button disabled" id="payButton" disabled
+            >Pay Now</button
+          >
+
+          <div class="payment-methods">
+            <span class="payment-label">We Accept:</span>
+            <div class="payment-icons">
+              <span class="payment-icon">💳</span>
+              <span class="payment-icon">🏦</span>
+              <span class="payment-icon">📱</span>
+            </div>
+          </div>
+
+          <p class="secure-message">🔒 Secure Checkout</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modern Alert Component -->
+  <div class="alert-container" id="alertContainer">
+    <div class="alert">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path
+            fill="currentColor"
+            d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-11v6h2v-6h-2zm0-4v2h2V7h-2z"
+          ></path>
+        </svg>
+      </div>
+      <div class="alert-content" id="alertContent">Alert message here</div>
+      <button class="alert-close" id="alertClose">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path
+            fill="currentColor"
+            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .checkout-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .checkout-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c2c54;
+    font-size: 2rem;
+  }
+
+  .checkout-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Loading screen styles */
+  .loading-container {
+    position: relative;
+    min-height: 200px;
+  }
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    border-radius: 12px;
+    opacity: 1;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+
+  .loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(44, 44, 84, 0.2);
+    border-radius: 50%;
+    border-top-color: #2c2c54;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .pc-card,
+  .bill-details {
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .pc-card:hover,
+  .bill-details:hover {
+    transform: translateY(-5px);
+  }
+
+  .pc-card-header,
+  .bill-header {
+    padding: 1.2rem;
+    background-color: #2c2c54;
+    color: white;
+  }
+
+  .pc-card-header h2,
+  .bill-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .pc-content,
+  .bill-content {
+    padding: 1.5rem;
+  }
+
+  .pc-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pc-image-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .pc-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .pc-details h3 {
+    color: #2c2c54;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .pc-description {
+    color: #555;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* PC Specs as a list */
+  .pc-specs-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .spec-item {
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+  }
+
+  .spec-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+  }
+
+  .spec-value {
+    font-weight: 600;
+    color: #2c2c54;
+  }
+
+  /* Rental options styling */
+  .rental-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .rental-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rental-field label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .rental-select,
+  .rental-input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f8f9fa;
+  }
+
+  .rental-input::-webkit-inner-spin-button,
+  .rental-input::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  .rental-actions {
+    margin-bottom: 1.5rem;
+  }
+
+  .order-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #2c2c54;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .order-button:hover {
+    background-color: #1e1e42;
+  }
+
+  .order-button.confirmed {
+    background-color: #797987;
+    cursor: not-allowed;
+  }
+
+  .pc-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+  }
+
+  .price-label {
+    color: #1e1e42;
+    font-weight: 600;
+  }
+
+  .price-value {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #2c2c54;
+  }
+
+  .bill-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    color: #555;
+  }
+
+  .bill-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 1.5rem 0;
+  }
+
+  .bill-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: #2c2c54;
+  }
+
+  .promo-code {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+
+  .promo-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px 0 0 6px;
+    font-size: 1rem;
+  }
+
+  .promo-button {
+    padding: 0 1rem;
+    background-color: #2c2c54;
+    color: white;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .promo-button:hover {
+    background-color: #1e1e42;
+  }
+
+  .pay-button {
+    width: 100%;
+    padding: 1rem;
+    background-color: #32cd32;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      opacity 0.3s ease;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .pay-button:hover:not(.disabled) {
+    background-color: #28a745;
+  }
+
+  .pay-button.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .payment-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .payment-icons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .payment-icon {
+    font-size: 1.5rem;
+  }
+
+  .secure-message {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Modern Alert Styles */
+  .alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 350px;
+    transform: translateX(400px);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .alert-container.show {
+    transform: translateX(0);
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+  }
+
+  .alert-icon {
+    margin-right: 12px;
+    color: #2c2c54;
+  }
+
+  .alert-content {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .alert-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #777;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    height: 2.2rem;
+    width: 2.2rem;
+  }
+
+  .alert-close:hover {
+    background-color: #f1f1f1;
+  }
+
+  .alert.success .alert-icon {
+    color: #28a745;
+  }
+
+  .alert.error .alert-icon {
+    color: #dc3545;
+  }
+
+  .alert.warning .alert-icon {
+    color: #ffc107;
+  }
+
+  /* Responsive styles */
+  @media (min-width: 768px) {
+    .checkout-container {
+      grid-template-columns: 3fr 2fr;
+    }
+
+    .pc-content {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+
+    .pc-image-container {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .pc-details {
+      flex: 2;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .pc-specs-list {
+      grid-template-columns: 1fr;
+    }
+
+    .rental-options {
+      grid-template-columns: 1fr;
+    }
+
+    .checkout-title {
+      font-size: 1.7rem;
+    }
+
+    .alert-container {
+      left: 20px;
+      right: 20px;
+      max-width: calc(100% - 40px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .checkout-wrapper {
+      padding: 1rem 0.5rem;
+    }
+
+    .bill-item,
+    .bill-total {
+      font-size: 0.9rem;
+    }
+
+    .pc-card-header h2,
+    .bill-header h2 {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<script>
+  import axios from "axios";
+  import {
+    getCookie,
+    getUrlParameters,
+    setCookie,
+  } from "../utils/cookiesHandler";
+
+  const getPcData = async () => {
+    try {
+      const { id, orderId } = getUrlParameters(window.location.href);
+
+      let url = null;
+      if (id) {
+        url = `http://localhost:8000/api/pc/getPCById?id=${id}`;
+      } else {
+        url = `http://localhost:8000/api/rent/getOrderById?orderId=${orderId}`;
+      }
+
+      if (!url) {
+        return null;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${getCookie("accessToken")}`,
+        },
+      });
+
+      return response.data.data;
+    } catch (error) {
+      return null;
+    }
+  };
+  const getCurrentUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/user/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${getCookie("accessToken")}`,
+          },
+        }
+      );
+
+      const user = response.data.user;
+
+      setCookie("username", user.username);
+      setCookie("email", user.email);
+      return user;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const createOrderInBackend = async (
+    pcId: string,
+    unit: string,
+    duration: number
+  ) => {
+    try {
+      const startDate = new Date();
+      const endDate = new Date(startDate);
+
+      if (unit == "day") {
+        endDate.setDate(endDate.getDate() + duration);
+      }
+
+      const order = {
+        pcId: pcId,
+        startDate,
+        endDate,
+        hours: unit == "hour" ? duration : 0,
+        duration,
+      };
+
+      console.log(order);
+
+      const response = await axios.post(
+        "http://localhost:8000/api/rent/",
+        order,
+        {
+          headers: {
+            Authorization: `Bearer ${getCookie("accessToken")}`,
+          },
+        }
+      );
+
+      setCookie("orderId", response.data.data._id);
+
+      return response.data.data;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const createOrderInRazorpay = async (id: string) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/order/create",
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${getCookie("accessToken")}`,
+          },
+        }
+      );
+
+      return response.data.order;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const payUsingRayzorPay = async () => {
+    const order = await createOrderInRazorpay(getCookie("orderId"));
+    if (!order) {
+      return null;
+    }
+    try {
+      const options = {
+        key: import.meta.env.PUBLIC_RAZORPAY_KEY.toString(),
+        amount: order.amount,
+        currency: order.currency,
+        name: "PC Rentals",
+        description: "Payment for renting pc",
+        order_id: order.id,
+        handler: async function (response: any) {
+          // Handle successful payment
+          try {
+            // Verify payment signature on your server
+            const verifyResponse = await axios.post(
+              "http://localhost:8000/api/order/verify",
+              { ...response, orderId: getCookie("orderId") },
+              {
+                headers: {
+                  Authorization: `Bearer ${getCookie("accessToken")}`,
+                },
+              }
+            );
+
+            const isVerified = verifyResponse.data;
+
+            if (isVerified) {
+              window.location.href = "/orders";
+            }
+
+            console.log(isVerified);
+          } catch (error) {
+            console.error("Error verifying payment:", error);
+          }
+        },
+        prefill: {
+          name: getCookie("username"),
+          email: getCookie("email"),
+          contact: "9876543210",
+        },
+        theme: {
+          color: "#3498db",
+        },
+      };
+
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Elements
+
+    let isItNewOrder = true;
+    const payButton = document.getElementById("payButton") as HTMLButtonElement;
+    const orderButton = document.getElementById(
+      "orderButton"
+    ) as HTMLButtonElement;
+    const alertContainer = document.getElementById("alertContainer");
+    const alertContent = document.getElementById("alertContent");
+    const alertClose = document.getElementById("alertClose");
+    const alert = document.querySelector(".alert");
+    const rentalUnit = document.getElementById(
+      "rentalUnit"
+    ) as HTMLInputElement;
+    const rentalDuration = document.getElementById(
+      "rentalDuration"
+    ) as HTMLInputElement;
+    const basePrice = document.getElementById("basePrice");
+    const totalPrice = document.getElementById("totalPrice");
+    const durationText = document.getElementById("durationText");
+    showAlert("No matter what, don't refresh the page", "info");
+
+    // Loading overlays
+    const loadingOverlays = document.querySelectorAll(".loading-overlay");
+    let selectedPC: any;
+
+    // Function to calculate and update prices
+    function updatePrices(selectedPC: any, isItNewOrder = true) {
+      if (!Object.keys(selectedPC).length) {
+        showAlert("No PC loadied", "error");
+        return;
+      }
+      const rates = {
+        day: selectedPC.rentPerDay,
+        hour: selectedPC.rentPerHour,
+      };
+      const unit = isItNewOrder
+        ? rentalUnit.value
+        : selectedPC.hours != 0
+          ? "hour"
+          : "day";
+      const duration = isItNewOrder
+        ? parseInt(rentalDuration.value)
+        : selectedPC.hours != 0
+          ? selectedPC.hours
+          : new Date(selectedPC.rentalPeriod.endDate).getTime() -
+            new Date(selectedPC.rentalPeriod.endDate).getTime();
+
+      const rate = isItNewOrder
+        ? rates[unit]
+        : selectedPC.hours != 0
+          ? selectedPC.rentPerHour
+          : selectedPC.rentPerDay;
+
+      const basePriceValue = rate * duration;
+
+      // Update UI elements
+      basePrice.textContent = `$${basePriceValue}`;
+      durationText.textContent = `${duration} ${unit}${duration > 1 ? "s" : ""}`;
+
+      // Calculate total (base + insurance + delivery + tax)
+      const insurancePrice = 49;
+      const deliveryPrice = 25;
+      const taxRate = 0.087;
+
+      const taxPrice = Math.round(basePriceValue * taxRate);
+      const totalPriceValue =
+        basePriceValue + insurancePrice + deliveryPrice + taxPrice;
+
+      // Update total price
+      totalPrice.textContent = `$${totalPriceValue}`;
+
+      if (!isItNewOrder) {
+        orderConfirmedUIUpdate();
+      }
+      loadingOverlays.forEach((overlay) => overlay.classList.add("hidden"));
+    }
+
+    // Add event listeners for rental options
+    if (rentalUnit) {
+      rentalUnit.addEventListener("change", updatePrices);
+    }
+
+    if (rentalDuration) {
+      rentalDuration.addEventListener("input", updatePrices);
+    }
+
+    // Function to show modern alert
+    function showAlert(message: string, type = "info", time = 5000) {
+      // Remove existing classes
+      alert.classList.remove("success", "error", "warning", "info");
+      // Add the type class
+      alert.classList.add(type);
+      // Set the message
+      alertContent.textContent = message;
+      // Show the alert
+      alertContainer.classList.add("show");
+
+      // Auto hide after 5 seconds
+      setTimeout(() => {
+        alertContainer.classList.remove("show");
+      }, time);
+    }
+
+    function orderConfirmedUIUpdate() {
+      rentalUnit.disabled = true;
+      rentalDuration.disabled = true;
+      orderButton.disabled = true;
+
+      // Update button styles
+      orderButton.classList.add("confirmed");
+      orderButton.textContent = "Order Confirmed";
+
+      // Enable pay button
+      payButton.disabled = false;
+      payButton.classList.remove("disabled");
+    }
+
+    // Close alert when clicking the close button
+    if (alertClose) {
+      alertClose.addEventListener("click", () => {
+        alertContainer.classList.remove("show");
+      });
+    }
+
+    // Order button event
+    if (orderButton) {
+      orderButton.addEventListener("click", async () => {
+        // Disable rental option fields
+
+        loadingOverlays.forEach((e) => e.classList.remove("hidden"));
+
+        const order = await createOrderInBackend(
+          selectedPC._id,
+          rentalUnit.value,
+          parseInt(rentalDuration.value)
+        );
+
+        rentalUnit.disabled = true;
+        rentalDuration.disabled = true;
+        orderButton.disabled = true;
+
+        // Update button styles
+        orderButton.classList.add("confirmed");
+        orderButton.textContent = "Order Confirmed";
+
+        // Enable pay button
+        payButton.disabled = false;
+        payButton.classList.remove("disabled");
+        loadingOverlays.forEach((e) => e.classList.add("hidden"));
+
+        if (!order) {
+          showAlert("Order didn't created, try again", "error");
+          return;
+        }
+        showAlert(
+          "Order details confirmed! You can now proceed to payment.",
+          "success"
+        );
+      });
+    }
+
+    // Pay button event
+    if (payButton) {
+      payButton.addEventListener("click", async () => {
+        showAlert("Processing your payment...", "info");
+
+        payButton.disabled = true;
+        payButton.classList.add("disabled");
+
+        const paymentConfirmed = await payUsingRayzorPay();
+
+        if (paymentConfirmed) {
+          showAlert("Payment failed contact support", "error");
+          return;
+        }
+        showAlert("payment successfull redirecting to your order", "info");
+      });
+    }
+
+    async function Initialize() {
+      const token = getCookie("accessToken");
+
+      if (token == undefined) {
+        showAlert("Couldn't rent, please login first !", "error", 1500);
+        setTimeout(() => showAlert("Redirecting to login page"), 1500);
+        setTimeout(() => (document.location.href = "/login"), 3000);
+        return;
+      }
+      const { id } = getUrlParameters(window.location.href);
+
+      isItNewOrder = id != null && id.trim() != "";
+
+      if (isItNewOrder) {
+        // inital state for new order
+        const pc = await getPcData();
+
+        if (!pc) {
+          // error state
+          showAlert("No PC Found, redirecting to home", "error");
+          setTimeout(() => (document.location.href = "/home"), 3000);
+          return;
+        }
+        selectedPC = pc;
+        updatePrices(pc);
+        return;
+      } else {
+        // initial state for previous order
+        const pc = await getPcData();
+
+        if (!pc) {
+          // error state
+          showAlert("No Order Found, redirecting to home", "error");
+          setTimeout(() => (document.location.href = "/home"), 3000);
+          return;
+        }
+        setCookie("orderId", pc._id);
+        selectedPC = pc;
+        updatePrices(pc, false);
+
+        return;
+      }
+    }
+
+    // Initialize prices
+    // updatePrices();
+    await Initialize();
+  });
+</script>

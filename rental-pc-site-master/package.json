@@ -1,0 +1,24 @@
+{
+  "name": "rental-pc-site",
+  "type": "module",
+  "version": "0.0.1",
+  "types": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.4.2",
+    "axios": "^1.8.4",
+    "i": "^0.3.7",
+    "js-cookie": "^3.0.5",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "sass-embedded": "^1.80.3"
+  }
+}

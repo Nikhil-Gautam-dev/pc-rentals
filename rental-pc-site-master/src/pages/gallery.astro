@@ -1,0 +1,120 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Image from "astro/components/Image.astro";
+export const prerender = false;
+import Card from "../components/Card.astro";
+import { getCollection } from "astro:content";
+import axios from "axios";
+
+let selectedPC: any = [];
+
+await (async () => {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/pc/`);
+    if (response.status === 200) {
+      selectedPC = response.data.data;
+    }
+  } catch (error) {
+    console.log("error in fetching ", error);
+  }
+})();
+
+const pcs = selectedPC || [];
+
+console.log(pcs);
+
+const pageTitle = "Gallery";
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <div class="collection">
+    <div class="collection-headings">
+      <h2>Performance for every budget</h2>
+      <h1>PC Collections</h1>
+    </div>
+    <div class="collection-container">
+      {
+        pcs && Array.isArray(pcs) && pcs.length > 0 ? (
+          pcs.map((pc: any) => (
+            <Card
+              image={pc.image}
+              name={pc.name}
+              specs={pc.specs}
+              slug={pc.name.split(" ").join("-").toLowerCase()}
+              id={pc._id}
+              loading="lazy"
+            />
+          ))
+        ) : (
+          <div class="no-pcs">
+            <p>
+              Currently loading our PC collection. Please check back shortly.
+            </p>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .collection {
+    padding: 1rem 7.5rem;
+    margin-top: 4rem;
+    .collection-headings {
+      font-family: "Oxanium";
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      h2 {
+        font-size: 1rem;
+        font-weight: 400;
+        color: #bdbdbd;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #f7f7f7;
+      }
+    }
+    .collection-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .no-pcs {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      background-color: #161026;
+      border-radius: 8px;
+      border: 1px solid #2a2241;
+    }
+    .collection-btn {
+      display: flex;
+      justify-content: center;
+      button {
+        margin-top: 2rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .collection {
+      padding: 0 2rem 5rem;
+      .collection-headings {
+        h1 {
+          font-size: 1.5rem;
+        }
+      }
+      .collection-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .collection-btn {
+        margin-top: 0.5rem;
+      }
+    }
+  }
+</style>

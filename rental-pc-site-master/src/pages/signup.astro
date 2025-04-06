@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+const pageTitle = "signup";
+---
+
+<BaseLayout pageTitle={pageTitle}>
+  <div class="main">
+    <form id="form">
+      <input type="text" name="username" placeholder="Username" required />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Signup</button>
+    </form>
+  </div>
+</BaseLayout>
+
+<script>
+  import axios from "axios";
+  const form = document.getElementById("form") as HTMLFormElement;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const username = formData.get("username");
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const res = await axios.post("http://localhost:8000/api/user/signup", {
+        email,
+        username,
+        password,
+      });
+
+      if (res.status == 201) {
+        window.location.href = "/login";
+      }
+      console.log(res);
+    } catch (error) {
+      alert("Invalid Signup!!");
+      window.location.href = "/signup";
+    }
+  });
+</script>
+
+<style>
+  .main {
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+  input,
+  textarea {
+    padding: 1rem;
+    border: 1px solid #2a2241;
+    border-radius: 8px;
+    background-color: #161026;
+    color: #bdbdbd;
+    width: 20rem;
+  }
+
+  button {
+    margin-top: 2rem;
+  }
+</style>
