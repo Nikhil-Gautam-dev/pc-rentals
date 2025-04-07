@@ -404,12 +404,13 @@ import Alert from "../components/Alert.astro";
   } from "../utils/cookiesHandler";
   import { addUserRow, addPcRows } from "../utils/dynamicHtml";
   import { setupAlertClose, showAlert } from "../utils/alertHandler";
+  import { API_URL } from "../utils/apiHandler";
 
   setupAlertClose("admin-alert");
 
   const adminLogin = async (passkey: string, form: HTMLFormElement) => {
     try {
-      const res = await axios.post("http://localhost:8000/api/user/passkey", {
+      const res = await axios.post(API_URL + "/user/passkey", {
         superKey: passkey,
       });
       if (res.status == 200) {
@@ -430,7 +431,7 @@ import Alert from "../components/Alert.astro";
 
   const addNewPC = async (formData: FormData, newPCForm: HTMLFormElement) => {
     try {
-      const res = await axios.post("http://localhost:8000/api/pc", formData, {
+      const res = await axios.post(API_URL + "/pc", formData, {
         headers: {
           Authorization: `Bearer ${getCookie("accessToken")}`,
         },
@@ -449,7 +450,7 @@ import Alert from "../components/Alert.astro";
 
   const getAndPopulateUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/user/getAll", {
+      const res = await axios.get(API_URL + "/user/getAll", {
         headers: {
           Authorization: `Bearer ${getCookie("adminToken")}`,
         },
@@ -465,7 +466,7 @@ import Alert from "../components/Alert.astro";
 
   const getAndPopulatePCs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/pc/", {
+      const res = await axios.get(API_URL + "/pc", {
         headers: {
           Authorization: `Bearer ${getCookie("adminToken")}`,
         },
@@ -483,7 +484,7 @@ import Alert from "../components/Alert.astro";
   const deletePC = async (id: string) => {
     showAlert("Deleting PC, please wait...", "info", "admin-alert");
     try {
-      const res = await axios.delete(`http://localhost:8000/api/pc?id=${id}`, {
+      const res = await axios.delete(API_URL + `/pc?id=${id}`, {
         headers: {
           Authorization: `Bearer ${getCookie("adminToken")}`,
         },

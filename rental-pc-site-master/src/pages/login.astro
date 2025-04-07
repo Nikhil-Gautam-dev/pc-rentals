@@ -22,7 +22,9 @@ import axios from "axios";
 <script>
   import axios from "axios";
   import { setCookie } from "../utils/cookiesHandler.ts";
+  import { API_URL } from "../utils/apiHandler.ts";
   const form = document.getElementById("form") as HTMLFormElement;
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -40,7 +42,7 @@ import axios from "axios";
       : "";
 
     try {
-      const res = await axios.post("http://localhost:8000/api/user/login", {
+      const res = await axios.post(API_URL + "/user/login", {
         email,
         username,
         password,

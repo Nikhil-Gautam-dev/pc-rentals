@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 export const prerender = false;
 import axios from "axios";
+import { API_URL } from "../utils/apiHandler";
 
 const id = Astro.url.searchParams.get("id");
 
@@ -10,7 +11,7 @@ let selectedPC: any;
 
 try {
   console.log(id);
-  const response = await axios.get(`http://localhost:8000/api/pc/getPCById?id=${id}`);
+  const response = await axios.get(API_URL+`/pc/getPCById?id=${id}`);
   if (response.status == 200) {
     selectedPC = response.data.data;
   }

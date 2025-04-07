@@ -20,10 +20,22 @@ const pageTitle = "About Us";
       </p>
     </div>
     <div class="about-image">
-      <img src="/pcs/6.jpg" alt="PC Rentals" loading="lazy" />
+      <img src="/pcs/6.jpg" alt="PC Rentals" loading="lazy" id="img" />
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const img = document.getElementById("img") as HTMLImageElement;
+
+    const images = ["/pcs/2.png", "/pcs/3.jpg", "/pcs/4.jpg", "/pcs/11.jpg"];
+
+    const image = images[Math.floor(Math.random() * images.length)];
+
+    img.src = image;
+  });
+</script>
 
 <style>
   .about-section {

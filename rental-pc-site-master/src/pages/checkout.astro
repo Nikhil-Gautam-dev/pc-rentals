@@ -3,14 +3,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 export const prerender = false;
 import axios from "axios";
+import { API_URL } from "../utils/apiHandler";
 
 const id = Astro.url.searchParams.get("id");
 const orderId = Astro.url.searchParams.get("orderId");
-
-Astro.cookies.get("");
-
-console.log(id);
-console.log();
 
 const isItNewOrder = id != null && id.trim() != "";
 
@@ -18,13 +14,12 @@ let selectedPC: any;
 
 let url = null;
 if (isItNewOrder) {
-  url = `http://localhost:8000/api/pc/getPCById?id=${id}`;
+  url = API_URL + `/pc/getPCById?id=${id}`;
 } else {
-  url = `http://localhost:8000/api/rent/getOrderById?orderId=${orderId}`;
+  url = API_URL + `/rent/getOrderById?orderId=${orderId}`;
 }
 
 try {
-  console.log(id);
   const response = await axios.get(url, {
     headers: {
       Authorization: Astro.cookies.get("accessToken").value,
@@ -698,6 +693,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
     getUrlParameters,
     setCookie,
   } from "../utils/cookiesHandler";
+  import { API_URL } from "../utils/apiHandler";
 
   const getPcData = async () => {
     try {
@@ -705,9 +701,9 @@ const totalPrice = Astro.props.totalPrice || 1051;
 
       let url = null;
       if (id) {
-        url = `http://localhost:8000/api/pc/getPCById?id=${id}`;
+        url = API_URL + `/pc/getPCById?id=${id}`;
       } else {
-        url = `http://localhost:8000/api/rent/getOrderById?orderId=${orderId}`;
+        url = API_URL + `/rent/getOrderById?orderId=${orderId}`;
       }
 
       if (!url) {
@@ -721,26 +717,6 @@ const totalPrice = Astro.props.totalPrice || 1051;
       });
 
       return response.data.data;
-    } catch (error) {
-      return null;
-    }
-  };
-  const getCurrentUser = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/api/user/profile`,
-        {
-          headers: {
-            Authorization: `Bearer ${getCookie("accessToken")}`,
-          },
-        }
-      );
-
-      const user = response.data.user;
-
-      setCookie("username", user.username);
-      setCookie("email", user.email);
-      return user;
     } catch (error) {
       return null;
     }
@@ -769,15 +745,11 @@ const totalPrice = Astro.props.totalPrice || 1051;
 
       console.log(order);
 
-      const response = await axios.post(
-        "http://localhost:8000/api/rent/",
-        order,
-        {
-          headers: {
-            Authorization: `Bearer ${getCookie("accessToken")}`,
-          },
-        }
-      );
+      const response = await axios.post(API_URL + "/rent", order, {
+        headers: {
+          Authorization: `Bearer ${getCookie("accessToken")}`,
+        },
+      });
 
       setCookie("orderId", response.data.data._id);
 
@@ -790,7 +762,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
   const createOrderInRazorpay = async (id: string) => {
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/order/create",
+        API_URL + "/order/create",
         { id },
         {
           headers: {
@@ -823,7 +795,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
           try {
             // Verify payment signature on your server
             const verifyResponse = await axios.post(
-              "http://localhost:8000/api/order/verify",
+              API_URL + "/order/verify",
               { ...response, orderId: getCookie("orderId") },
               {
                 headers: {
@@ -889,7 +861,10 @@ const totalPrice = Astro.props.totalPrice || 1051;
     let selectedPC: any;
 
     // Function to calculate and update prices
-    function updatePrices(selectedPC: any, isItNewOrder = true) {
+    function updatePrices(pc: any = null, isItNewOrder = true) {
+      if (pc != null || pc != undefined) {
+        selectedPC = pc;
+      }
       if (!Object.keys(selectedPC).length) {
         showAlert("No PC loadied", "error");
         return;
@@ -916,6 +891,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
           ? selectedPC.rentPerHour
           : selectedPC.rentPerDay;
 
+      console.log(rate);
       const basePriceValue = rate * duration;
 
       // Update UI elements
@@ -942,11 +918,11 @@ const totalPrice = Astro.props.totalPrice || 1051;
 
     // Add event listeners for rental options
     if (rentalUnit) {
-      rentalUnit.addEventListener("change", updatePrices);
+      rentalUnit.addEventListener("change", () => updatePrices());
     }
 
     if (rentalDuration) {
-      rentalDuration.addEventListener("input", updatePrices);
+      rentalDuration.addEventListener("input", () => updatePrices());
     }
 
     // Function to show modern alert

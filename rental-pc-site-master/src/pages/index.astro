@@ -4,12 +4,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 export const prerender = false;
 import Card from "../components/Card.astro";
 import axios from "axios";
+import { API_URL } from "../utils/apiHandler";
 
 let selectedPC: any = [];
 
 await (async () => {
   try {
-    const response = await axios.get(`http://localhost:8000/api/pc/`);
+    const response = await axios.get(API_URL + `/pc`);
     if (response.status === 200) {
       selectedPC = response.data.data;
     }
@@ -25,8 +26,6 @@ const filteredPC = selectedPC.filter((pc: any) => {
 });
 
 const pcs = filteredPC || [];
-
-console.log(pcs);
 
 const pageTitle = "Home";
 ---

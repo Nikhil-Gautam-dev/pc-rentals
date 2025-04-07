@@ -77,6 +77,8 @@ export const rentPc = async (req, res) => {
 
     const newRentCreated = await RentalPc.create(newRent);
 
+    await PC.findOneAndUpdate({ _id: mongoPCId }, { $set: { rented: true } });
+
     return res.status(201).json({
       success: true,
       message: "new rent created successfully",

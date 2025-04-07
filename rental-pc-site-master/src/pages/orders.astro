@@ -613,6 +613,7 @@ export const prerender = false;
 <script>
   import { getCookie } from "../utils/cookiesHandler";
   import axios from "axios";
+  import { API_URL } from "../utils/apiHandler";
 
   document.addEventListener("DOMContentLoaded", () => {
     // DOM Elements
@@ -634,7 +635,7 @@ export const prerender = false;
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/pc/getPCByUserId?userId=${getCookie("userId")}`,
+          API_URL + `/pc/getPCByUserId?userId=${getCookie("userId")}`,
           {
             headers: {
               Authorization: `Bearer ${getCookie("accessToken")}`,
