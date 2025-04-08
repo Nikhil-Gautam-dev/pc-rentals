@@ -865,6 +865,8 @@ const totalPrice = Astro.props.totalPrice || 1051;
         showAlert("No PC loadied", "error");
         return;
       }
+
+      console.log(selectedPC);
       const rates = {
         day: selectedPC.rentPerDay,
         hour: selectedPC.rentPerHour,
@@ -878,14 +880,20 @@ const totalPrice = Astro.props.totalPrice || 1051;
         ? parseInt(rentalDuration.value)
         : selectedPC.hours != 0
           ? selectedPC.hours
-          : new Date(selectedPC.rentalPeriod.endDate).getTime() -
-            new Date(selectedPC.rentalPeriod.endDate).getTime();
+          : Math.ceil(
+              (new Date(selectedPC.rentalPeriod.endDate).getTime() -
+                new Date(selectedPC.rentalPeriod.startDate).getTime()) /
+                (1000 * 60 * 60 * 24)
+            );
 
       const rate = isItNewOrder
         ? rates[unit]
         : selectedPC.hours != 0
           ? selectedPC.rentPerHour
           : selectedPC.rentPerDay;
+
+      console.log(rate);
+      console.log(duration);
 
       const basePriceValue = rate * duration;
 
