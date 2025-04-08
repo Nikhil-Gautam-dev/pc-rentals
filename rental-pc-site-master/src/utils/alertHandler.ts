@@ -36,3 +36,10 @@ export function setupAlertClose(containerId = 'alertContainer') {
         });
     }
 }
+
+export function closeAlert(containerId = 'alertContainer') {
+    const alertContainer = document.getElementById(containerId);
+    if (!alertContainer) return;
+
+    alertContainer.classList.remove('show');
+}

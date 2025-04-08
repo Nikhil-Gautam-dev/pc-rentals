@@ -1,4 +1,5 @@
 ---
+import Alert from "../components/Alert.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 const pageTitle = "login";
 import axios from "axios";
@@ -17,6 +18,7 @@ import axios from "axios";
       <button type="submit">Login</button>
     </form>
   </div>
+  <Alert id="login-alert" />
 </BaseLayout>
 
 <script>
@@ -24,44 +26,74 @@ import axios from "axios";
   import { setCookie } from "../utils/cookiesHandler.ts";
   import { API_URL } from "../utils/apiHandler.ts";
   const form = document.getElementById("form") as HTMLFormElement;
+  import {
+    setupAlertClose,
+    showAlert,
+    closeAlert,
+  } from "../utils/alertHandler";
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  document.addEventListener("DOMContentLoaded", async () => {
+    setupAlertClose("login-alert");
+    showAlert("Please login with email or username", "info", "login-alert");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showAlert(
+        "Please wait processing your credentials...",
+        "info",
+        "login-alert"
+      );
 
-    const formData = new FormData(form);
+      const formData = new FormData(form);
 
-    const credentail = formData.get("credentail");
-    const password = formData.get("password");
+      const credentail = formData.get("credentail");
+      const password = formData.get("password");
 
-    const email = credentail.toString().includes("@")
-      ? credentail.toString()
-      : "";
+      const email = credentail.toString().includes("@")
+        ? credentail.toString()
+        : "";
 
-    const username = !credentail.toString().includes("@")
-      ? credentail.toString()
-      : "";
+      const username = !credentail.toString().includes("@")
+        ? credentail.toString()
+        : "";
 
-    try {
-      const res = await axios.post(API_URL + "/user/login", {
-        email,
-        username,
-        password,
-      });
-
-      if (res.status == 200) {
-        setCookie("accessToken", res.data.token, {
-          expires: new Date(Date.now() + res.data.expires),
+      try {
+        const res = await axios.post(API_URL + "/user/login", {
+          email,
+          username,
+          password,
         });
-        setCookie("userId", res.data.user._id, {
-          expires: new Date(Date.now() + res.data.expires),
-        });
-        window.location.href = "/";
+
+        if (res.status == 200) {
+          setCookie("accessToken", res.data.token, {
+            expires: new Date(Date.now() + res.data.expires),
+          });
+          setCookie("userId", res.data.user._id, {
+            expires: new Date(Date.now() + res.data.expires),
+          });
+
+          setTimeout(() => {
+            closeAlert("login-alert");
+            window.location.href = "/";
+          }, 2000);
+        }
+      } catch (error) {
+        closeAlert("login-alert");
+        if (error?.response?.status == 404 || 401) {
+          showAlert(
+            "wrong credentials,please try again",
+            "error",
+            "login-alert"
+          );
+        } else {
+          showAlert(
+            "something went wrong while login you in, please try again",
+            "error",
+            "login-alert"
+          );
+        }
+        form.reset();
       }
-      console.log(res);
-    } catch (error) {
-      alert("Invalid login!!");
-      window.location.href = "/login";
-    }
+    });
   });
 </script>
 

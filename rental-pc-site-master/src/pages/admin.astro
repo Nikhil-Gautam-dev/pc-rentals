@@ -424,7 +424,6 @@ import Alert from "../components/Alert.astro";
       }
       return true;
     } catch (error) {
-      console.log(error);
       return null;
     }
   };
@@ -456,7 +455,6 @@ import Alert from "../components/Alert.astro";
         },
       });
       const users = res.data.data;
-      console.log(users);
       addUserRow(users, "admin-user-table-body");
     } catch (error) {
       window.location.href = "/";

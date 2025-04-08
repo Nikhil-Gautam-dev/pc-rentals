@@ -94,12 +94,12 @@ const totalPrice = Astro.props.totalPrice || 1051;
 
             <p class="pc-price">
               <span class="price-label">Price per day:</span>
-              <span class="price-value">${selectedPC.rentPerDay}</span>
+              <span class="price-value">Rs {selectedPC.rentPerDay}</span>
             </p>
 
             <p class="pc-price">
               <span class="price-label">Price per hour:</span>
-              <span class="price-value">${selectedPC.rentPerHour}</span>
+              <span class="price-value">Rs {selectedPC.rentPerHour}</span>
             </p>
 
             <div class="rental-options">
@@ -143,7 +143,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
         <div class="bill-content">
           <div class="bill-item">
             <span>Base Rental Price</span>
-            <span id="basePrice">${selectedPC.rentPerDay}</span>
+            <span id="basePrice">Rs {selectedPC.rentPerDay}</span>
           </div>
           <div class="bill-item">
             <span>Duration</span>
@@ -151,20 +151,20 @@ const totalPrice = Astro.props.totalPrice || 1051;
           </div>
           <div class="bill-item">
             <span>Insurance</span>
-            <span>$49</span>
+            <span>Rs 49</span>
           </div>
           <div class="bill-item">
             <span>Delivery</span>
-            <span>$25</span>
+            <span>Rs 25</span>
           </div>
           <div class="bill-item">
             <span>Tax</span>
-            <span>$78</span>
+            <span>Rs 78</span>
           </div>
           <div class="bill-divider"></div>
           <div class="bill-total">
             <span>Total</span>
-            <span id="totalPrice">${totalPrice}</span>
+            <span id="totalPrice">Rs {totalPrice}</span>
           </div>
 
           <button class="pay-button disabled" id="payButton" disabled
@@ -743,8 +743,6 @@ const totalPrice = Astro.props.totalPrice || 1051;
         duration,
       };
 
-      console.log(order);
-
       const response = await axios.post(API_URL + "/rent", order, {
         headers: {
           Authorization: `Bearer ${getCookie("accessToken")}`,
@@ -809,8 +807,6 @@ const totalPrice = Astro.props.totalPrice || 1051;
             if (isVerified) {
               window.location.href = "/orders";
             }
-
-            console.log(isVerified);
           } catch (error) {
             console.error("Error verifying payment:", error);
           }
@@ -891,11 +887,10 @@ const totalPrice = Astro.props.totalPrice || 1051;
           ? selectedPC.rentPerHour
           : selectedPC.rentPerDay;
 
-      console.log(rate);
       const basePriceValue = rate * duration;
 
       // Update UI elements
-      basePrice.textContent = `$${basePriceValue}`;
+      basePrice.textContent = `Rs ${basePriceValue}`;
       durationText.textContent = `${duration} ${unit}${duration > 1 ? "s" : ""}`;
 
       // Calculate total (base + insurance + delivery + tax)
@@ -908,7 +903,7 @@ const totalPrice = Astro.props.totalPrice || 1051;
         basePriceValue + insurancePrice + deliveryPrice + taxPrice;
 
       // Update total price
-      totalPrice.textContent = `$${totalPriceValue}`;
+      totalPrice.textContent = `Rs ${totalPriceValue}`;
 
       if (!isItNewOrder) {
         orderConfirmedUIUpdate();

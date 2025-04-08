@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Alert from "../components/Alert.astro";
 const pageTitle = "signup";
 ---
 
@@ -12,36 +13,71 @@ const pageTitle = "signup";
       <button type="submit">Signup</button>
     </form>
   </div>
+  <Alert id="signup-alert" />
 </BaseLayout>
 
 <script>
   import axios from "axios";
   import { API_URL } from "../utils/apiHandler";
-  const form = document.getElementById("form") as HTMLFormElement;
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  import {
+    showAlert,
+    setupAlertClose,
+    closeAlert,
+  } from "../utils/alertHandler";
 
-    const formData = new FormData(form);
+  document.addEventListener("DOMContentLoaded", async () => {
+    setupAlertClose("signup-alert");
+    showAlert(
+      "Please create new account with email and password",
+      "info",
+      "signup-alert"
+    );
+    const form = document.getElementById("form") as HTMLFormElement;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      showAlert(
+        "Please wait, processing your credentials...",
+        "info",
+        "signup-alert"
+      );
 
-    const username = formData.get("username");
-    const email = formData.get("email");
-    const password = formData.get("password");
+      const formData = new FormData(form);
 
-    try {
-      const res = await axios.post(API_URL + "/user/signup", {
-        email,
-        username,
-        password,
-      });
+      const username = formData.get("username");
+      const email = formData.get("email");
+      const password = formData.get("password");
 
-      if (res.status == 201) {
-        window.location.href = "/login";
+      try {
+        const res = await axios.post(API_URL + "/user/signup", {
+          email,
+          username,
+          password,
+        });
+
+        if (res.status == 201) {
+          showAlert("account created successfully", "success", "signup-alert");
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);
+        }
+      } catch (error) {
+        closeAlert("signup-alert");
+        if (error?.response?.status == 400) {
+          showAlert(
+            "User exist with this email or username, try again",
+            "error",
+            "signup-alert"
+          );
+        } else {
+          showAlert(
+            "something went wrong while sign in you, please try again",
+            "error",
+            "signup-alert"
+          );
+        }
+        form.reset();
       }
-      console.log(res);
-    } catch (error) {
-      alert("Invalid Signup!!");
-      window.location.href = "/signup";
-    }
+    });
   });
 </script>
 

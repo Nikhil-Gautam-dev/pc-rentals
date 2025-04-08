@@ -10,7 +10,6 @@ const id = Astro.url.searchParams.get("id");
 let selectedPC: any;
 
 try {
-  console.log(id);
   const response = await axios.get(API_URL+`/pc/getPCById?id=${id}`);
   if (response.status == 200) {
     selectedPC = response.data.data;
@@ -30,7 +29,6 @@ selectedPC = selectedPC || {
   specs: ["abv"],
 };
 
-console.log(selectedPC);
 
 const totalPrice = Astro.props.totalPrice || 1051;
 
